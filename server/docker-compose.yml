@@ -1,0 +1,31 @@
+version: '2'
+services:
+  couchdb:
+    image: docker.io/bitnami/couchdb:3
+    environment:
+      - COUCHDB_PASSWORD=couchdb
+    ports:
+      - '5984:5984'
+      - '4369:4369'
+      - '9100:9100'
+    volumes:
+      - couchdb_data:/bitnami/couchdb
+      - ./config/pouchdb:/opt/bitnami/couchdb/etc/local.d
+
+  http:
+      image: "nginx:1.13.5"
+   
+      ports:
+        - "${SERVICE_PORT:-5288}:80"
+      volumes:
+        - ./config/nginx:/etc/nginx/conf.d
+        - ./config/nginx:/etc/nginx/auth
+        - ./reports:/www/dist/reports
+
+      depends_on: 
+        - couchdb
+    
+volumes:
+  couchdb_data:
+    driver: local
+
